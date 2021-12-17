@@ -4,13 +4,14 @@ import xml from 'xml';
 
 export class LineChart {
   private readonly config: LineChartConfig = {
-    height: 100,
-    width: 300,
+    height: 110,
+    width: 310,
+    padding: 5,
     strokeThickness: 2,
     strokeColor: '#2196F3',
   };
 
-  constructor(config: LineChartConfig) {
+  constructor(config: LineChartConfig = {}) {
     this.config = {
       ...this.config,
       ...config,
@@ -18,10 +19,10 @@ export class LineChart {
   }
 
   private getPolylinePoints(data: number[], xAxisGap: number) {
-    const { height } = this.config;
+    const { height, padding } = this.config;
 
     const points = data.map((value, index) => {
-      const xPoint = index * xAxisGap!;
+      const xPoint = index * xAxisGap! + padding!;
       const yPoint = height! - value;
 
       return [xPoint, yPoint];
@@ -35,13 +36,20 @@ export class LineChart {
       throw new Error('Data must be a string array or a number array.');
     }
 
-    const { height, width, strokeThickness, strokeColor } = this.config;
+    const { height, width, padding, strokeThickness, strokeColor } =
+      this.config;
 
     const numberOfPoints = data.length;
 
-    const normalizedData = normalizeArrayByMinMax(data.map(Number), 0, height!);
+    const normalizedData = normalizeArrayByMinMax(
+      data.map(Number),
+      padding!,
+      height! - padding!
+    );
 
-    const xAxisGap = width! / (numberOfPoints - 1);
+    const actualWidth = width! - 2 * padding!;
+
+    const xAxisGap = actualWidth! / (numberOfPoints - 1);
 
     const polylinePoints = this.getPolylinePoints(normalizedData, xAxisGap);
 
