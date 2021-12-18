@@ -4,4 +4,11 @@ export interface LineChartConfig {
   padding?: number;
   strokeThickness?: number;
   strokeColor?: string;
+  gradient?:
+    | {
+        offset: string;
+        stopOpacity: string;
+        stopColor: string;
+      }[]
+    | false;
 }

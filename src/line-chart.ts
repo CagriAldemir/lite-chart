@@ -9,6 +9,7 @@ export class LineChart {
     padding: 5,
     strokeThickness: 2,
     strokeColor: '#2196F3',
+    gradient: false,
   };
 
   constructor(config: LineChartConfig = {}) {
@@ -19,41 +20,52 @@ export class LineChart {
   }
 
   private getPolylinePoints(data: number[], xAxisGap: number) {
-    const { height, padding } = this.config;
+    const { height, strokeThickness, gradient } = this.config;
 
-    const points = data.map((value, index) => {
-      const xPoint = index * xAxisGap! + padding!;
+    let points = data.map((value, index) => {
+      const xPoint = index * xAxisGap;
       const yPoint = height! - value;
 
       return [xPoint, yPoint];
     });
+
+    if (gradient) {
+      const lastIndex = points.length - 1;
+
+      points[0][0] = points[0][0] - strokeThickness! / 2;
+
+      points[lastIndex][0] = points[lastIndex][0] + strokeThickness! / 2;
+
+      const newFirstPoint = [points[0][0], height!];
+      const newLastPoint = [points[lastIndex][0], height!];
+
+      points = [newFirstPoint, ...points, newLastPoint];
+    }
 
     return points.map((point) => point.join(',')).join(' ');
   }
 
   getSvgString(data: string[] | number[]) {
     if (!Array.isArray(data)) {
-      throw new Error('Data must be a string array or a number array.');
+      throw new Error('"data" param must be a string array or a number array.');
     }
 
-    const { height, width, padding, strokeThickness, strokeColor } =
+    const { height, width, padding, strokeThickness, strokeColor, gradient } =
       this.config;
 
     const numberOfPoints = data.length;
 
     const normalizedData = normalizeArrayByMinMax(
       data.map(Number),
-      padding!,
+      padding,
       height! - padding!
     );
 
-    const actualWidth = width! - 2 * padding!;
-
-    const xAxisGap = actualWidth! / (numberOfPoints - 1);
+    const xAxisGap = width! / (numberOfPoints - 1);
 
     const polylinePoints = this.getPolylinePoints(normalizedData, xAxisGap);
 
-    const xmlSchema = {
+    const xmlSchema: any = {
       svg: [
         {
           _attr: {
@@ -65,7 +77,7 @@ export class LineChart {
           polyline: [
             {
               _attr: {
-                fill: 'none',
+                fill: gradient ? 'url(#g)' : 'none',
                 stroke: strokeColor,
                 'stroke-width': strokeThickness,
                 points: polylinePoints,
@@ -75,6 +87,43 @@ export class LineChart {
         },
       ],
     };
+
+    if (gradient) {
+      if (!Array.isArray(gradient)) {
+        throw new Error('"gradient" must be an array.');
+      }
+      const stopObjects = gradient.map(
+        ({ offset, stopOpacity, stopColor }) => ({
+          stop: [
+            {
+              _attr: {
+                offset,
+                'stop-opacity': stopOpacity,
+                'stop-color': stopColor,
+              },
+            },
+          ],
+        })
+      );
+
+      const gradientObject = {
+        defs: [
+          {
+            linearGradient: [
+              {
+                _attr: {
+                  id: 'g',
+                  gradientTransform: 'rotate(90)',
+                },
+              },
+              ...stopObjects,
+            ],
+          },
+        ],
+      };
+
+      xmlSchema.svg.push(gradientObject);
+    }
 
     return xml(xmlSchema, { declaration: true });
   }
