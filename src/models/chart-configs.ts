@@ -11,4 +11,5 @@ export interface LineChartConfig {
         stopColor: string;
       }[]
     | false;
+  savePath?: string;
 }

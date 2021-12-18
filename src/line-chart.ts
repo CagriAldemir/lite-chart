@@ -1,4 +1,4 @@
-import { normalizeArrayByMinMax } from './utils';
+import { normalizeArrayByMinMax, writeFile } from './utils';
 import { LineChartConfig } from './models/chart-configs';
 import xml from 'xml';
 
@@ -10,6 +10,7 @@ export class LineChart {
     strokeThickness: 2,
     strokeColor: '#2196F3',
     gradient: false,
+    savePath: undefined,
   };
 
   constructor(config: LineChartConfig = {}) {
@@ -132,5 +133,18 @@ export class LineChart {
     const svgString = this.getSvgString(data).replace(/#/g, '%23');
     const svgObjectUrl = `data:image/svg+xml;charset=utf-8,${svgString}`;
     return svgObjectUrl;
+  }
+
+  saveAsFile(data: string[] | number[], savePath?: string) {
+    const mSavePath = savePath || this.config.savePath;
+
+    if (!mSavePath) {
+      throw new Error(
+        '"savePath" must be sent in the config or as a parameter.'
+      );
+    }
+
+    const svgString = this.getSvgString(data);
+    return writeFile(mSavePath, svgString);
   }
 }
