@@ -5,7 +5,7 @@ import xml from 'xml';
 export class LineChart {
   private readonly config: LineChartConfig = {
     height: 110,
-    width: 310,
+    width: 300,
     padding: 5,
     strokeThickness: 2,
     strokeColor: '#2196F3',
