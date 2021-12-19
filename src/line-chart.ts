@@ -10,7 +10,6 @@ export class LineChart {
     strokeThickness: 2,
     strokeColor: '#2196F3',
     gradient: false,
-    savePath: undefined,
   };
 
   constructor(config: LineChartConfig = {}) {
@@ -135,16 +134,8 @@ export class LineChart {
     return svgObjectUrl;
   }
 
-  saveAsFile(data: string[] | number[], savePath?: string) {
-    const mSavePath = savePath || this.config.savePath;
-
-    if (!mSavePath) {
-      throw new Error(
-        '"savePath" must be sent in the config or as a parameter.'
-      );
-    }
-
+  saveAsFile(data: string[] | number[], savePath: string) {
     const svgString = this.getSvgString(data);
-    return writeFile(mSavePath, svgString);
+    return writeFile(savePath, svgString);
   }
 }
