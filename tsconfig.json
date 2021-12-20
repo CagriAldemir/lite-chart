@@ -10,5 +10,6 @@
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": "./"
-  }
+  },
+  "exclude": ["node_modules", "dist", "examples"]
 }

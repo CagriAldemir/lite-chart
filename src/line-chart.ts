@@ -2,7 +2,7 @@ import { normalizeArrayByMinMax, writeFile } from './utils';
 import { LineChartConfig } from './models/chart-configs';
 import xml from 'xml';
 
-export class LineChart {
+export default class LineChart {
   private readonly config: LineChartConfig = {
     height: 110,
     width: 300,
