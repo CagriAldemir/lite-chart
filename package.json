@@ -1,6 +1,6 @@
 {
   "name": "lite-chart",
-  "version": "0.0.0",
+  "version": "0.1.0-rc.1",
   "description": "Lightweight SVG chart generator.",
   "author": "CagriAldemir",
   "license": "ISC",
