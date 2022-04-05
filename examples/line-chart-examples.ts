@@ -24,12 +24,16 @@ const RANDOM_DATA = Array.from({ length: 24 }, () =>
   Math.floor(Math.random() * 1000)
 );
 
-const lineChart = new LineChart(lineChartConfig);
+debugger;
 
-const imageSource = lineChart.getImageSource(RANDOM_DATA);
-console.log(imageSource);
+const xx = LineChart.getImageSource(RANDOM_DATA, lineChartConfig);
 
-const svgString = lineChart.getSvgString(RANDOM_DATA);
-console.log(svgString);
+const yy = LineChart.getSvgString(RANDOM_DATA, lineChartConfig);
 
-lineChart.saveAsFile(RANDOM_DATA, './charts/example.svg');
+console.log(xx);
+console.log('===');
+console.log('===');
+console.log('===');
+console.log(yy);
+
+LineChart.saveAsFile(RANDOM_DATA, './charts/xxx.svg', lineChartConfig);

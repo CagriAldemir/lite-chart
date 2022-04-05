@@ -3,7 +3,7 @@ import { LineChartConfig } from './models/chart-configs';
 import xml from 'xml';
 
 export default class LineChart {
-  private readonly config: LineChartConfig = {
+  private readonly _config: LineChartConfig = {
     height: 110,
     width: 300,
     padding: 5,
@@ -12,8 +12,23 @@ export default class LineChart {
     gradient: false,
   };
 
+  private tempConfig: LineChartConfig = {};
+
+  private static lineChartInstance = new LineChart();
+
+  public get config(): LineChartConfig {
+    const mConfig = {
+      ...this._config,
+      ...this.tempConfig,
+    };
+    this.tempConfig = {};
+    return mConfig;
+  }
+
   constructor(config: LineChartConfig = {}) {
-    this.config = {
+    console.log('LineChart constructor');
+
+    this._config = {
       ...this.config,
       ...config,
     };
@@ -45,11 +60,12 @@ export default class LineChart {
     return points.map((point) => point.join(',')).join(' ');
   }
 
-  getSvgString(data: string[] | number[]) {
+  getSvgString(data: string[] | number[], config?: LineChartConfig) {
     if (!Array.isArray(data)) {
       throw new Error('"data" param must be a string array or a number array.');
     }
 
+    this.tempConfig = config || {};
     const { height, width, padding, strokeThickness, strokeColor, gradient } =
       this.config;
 
@@ -128,14 +144,34 @@ export default class LineChart {
     return xml(xmlSchema, { declaration: true });
   }
 
-  getImageSource(data: string[] | number[]) {
-    const svgString = this.getSvgString(data).replace(/#/g, '%23');
+  getImageSource(data: string[] | number[], config?: LineChartConfig) {
+    const svgString = this.getSvgString(data, config).replace(/#/g, '%23');
     const svgObjectUrl = `data:image/svg+xml;charset=utf-8,${svgString}`;
     return svgObjectUrl;
   }
 
-  saveAsFile(data: string[] | number[], savePath: string) {
-    const svgString = this.getSvgString(data);
+  saveAsFile(
+    data: string[] | number[],
+    savePath: string,
+    config?: LineChartConfig
+  ) {
+    const svgString = this.getSvgString(data, config);
     return writeFile(savePath, svgString);
+  }
+
+  static getSvgString(data: string[] | number[], config?: LineChartConfig) {
+    return this.lineChartInstance.getSvgString(data, config);
+  }
+
+  static getImageSource(data: string[] | number[], config?: LineChartConfig) {
+    return this.lineChartInstance.getImageSource(data, config);
+  }
+
+  static saveAsFile(
+    data: string[] | number[],
+    savePath: string,
+    config?: LineChartConfig
+  ) {
+    return this.lineChartInstance.saveAsFile(data, savePath, config);
   }
 }
